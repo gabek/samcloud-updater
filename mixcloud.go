@@ -22,7 +22,7 @@ func processMixcloud() {
 		if !FileExists(filename) {
 			fmt.Println(episodeTitle)
 			downloadFile(filename, url)
-			newFilename := "audio/" + GenerateSlug(episodeTitle) + ".mp3"
+			newFilename := "audio/" + GenerateSlug(user.Title) + ".mp3"
 			TranscodeToMP3(filename, newFilename)
 			setID3TagsForFile(newFilename, user.Title, episodeTitle)
 			AddFileToUploadList(newFilename)

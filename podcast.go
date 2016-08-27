@@ -19,9 +19,9 @@ func processPodcasts() {
 		filetype := path.Ext(audioURL)
 
 		if filetype == ".m4a" {
-			filename = "transcode/" + GenerateSlug(episodeName) + ".m4a"
+			filename = "transcode/" + GenerateSlug(podcast.Title) + ".m4a"
 		} else {
-			filename = "audio/" + GenerateSlug(episodeName) + ".mp3"
+			filename = "audio/" + GenerateSlug(podcast.Title) + ".mp3"
 		}
 
 		if !FileExists(filename) {
@@ -30,7 +30,7 @@ func processPodcasts() {
 			downloadFile(filename, audioURL)
 
 			if filetype == ".m4a" {
-				newFilename := "audio/" + GenerateSlug(episodeName) + ".mp3"
+				newFilename := "audio/" + GenerateSlug(podcast.Title) + ".mp3"
 				TranscodeToMP3(filename, newFilename)
 				filename = newFilename
 			}

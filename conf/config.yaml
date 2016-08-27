@@ -1,0 +1,17 @@
+podcasts:
+    - title: The Requiem Podcast
+      url: http://therequiem.libsyn.com/rss
+    - title: Communion After Dark
+      url: http://communionafterdark.com/rss.xml
+
+mixcloud:
+    - title: DJ Dark Machine
+      username: djdarkmachine
+    - title: DJ Led Manville
+      username: djledmanville
+
+station:
+  username: "your@email.address"
+  password: yourPassword
+  id: 12345
+  playlist: Mixes

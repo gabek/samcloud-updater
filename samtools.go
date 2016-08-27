@@ -43,6 +43,6 @@ func addToStation() {
 
 func samToolsCheck() {
 	if !FileExists("SAM/PlaylistUtil") || !FileExists("SAM/ImportUtil") {
-		log.Fatal("ERROR: SAM Broadcaster Import Utilities must be available in the SAM directory.")
+		log.Fatal("ERROR: SAM Broadcaster Import Utilities must be available in the SAM directory.  Download from http://spacial.com/library-import-utility/.")
 	}
 }

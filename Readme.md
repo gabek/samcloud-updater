@@ -22,6 +22,7 @@ While it makes sense just to build this yourself, I am providing [Linux and OS X
 1. go get github.com/gabek/samcloud-updater
 2. cd $GOPATH/src/github.com/gabek/samcloud-updater
 3. go build
+
 Feel free to move the resulting `samcloud-updater` binary anywhere you like, as long as the `SAM` and `conf` directories go with it.
 
 #### Audio storage directories

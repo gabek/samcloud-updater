@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"path"
 
 	"github.com/SlyMarbo/rss"
@@ -11,7 +12,7 @@ func processPodcasts() {
 	podcasts := getConfig().Podcasts
 
 	for _, podcast := range podcasts {
-		fmt.Print(podcast.Title + "...")
+		log.Print(podcast.Title + "...")
 
 		episodeName, audioURL := itemForRssFeedURL(podcast.URL)
 
@@ -25,7 +26,7 @@ func processPodcasts() {
 		}
 
 		if !FileExists(filename) {
-			fmt.Println(episodeName)
+			log.Println("Downloading " + episodeName)
 
 			downloadFile(filename, audioURL)
 
@@ -38,7 +39,7 @@ func processPodcasts() {
 			setID3TagsForFile(filename, podcast.Title, episodeName)
 			AddFileToUploadList(filename)
 		} else {
-			fmt.Println("episode exists")
+			fmt.Println("no new episode.")
 		}
 	}
 }

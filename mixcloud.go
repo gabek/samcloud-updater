@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"path"
 	"strings"
 
@@ -13,21 +14,21 @@ func processMixcloud() {
 	mixcloudUsers := getConfig().Mixcloud
 
 	for _, user := range mixcloudUsers {
-		fmt.Print(user.Title + "...")
+		log.Print(user.Title + "...")
 
 		episodeTitle, url := detailsForMixcloudUser(user.Username)
 		baseFile := path.Base(url)
 		filename := "transcode/" + baseFile
 
 		if !FileExists(filename) {
-			fmt.Println(episodeTitle)
+			log.Println("Downloading " + episodeTitle)
 			downloadFile(filename, url)
 			newFilename := "audio/" + GenerateSlug(user.Title) + ".mp3"
 			TranscodeToMP3(filename, newFilename)
 			setID3TagsForFile(newFilename, user.Title, episodeTitle)
 			AddFileToUploadList(newFilename)
 		} else {
-			fmt.Println("mix exists")
+			fmt.Println("no new mix")
 		}
 	}
 }

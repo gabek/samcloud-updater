@@ -41,17 +41,24 @@ func downloadFile(filepath string, url string) (err error) {
 }
 
 func setID3TagsForFile(filepath string, artist string, title string) {
+	defer func() {
+		if e := recover(); e != nil {
+			fmt.Println("id3 tagging error: ", e)
+		}
+	}()
+
 	mp3File, err := id3v2.Open(filepath)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	defer mp3File.Close()
+
 	mp3File.SetArtist(artist)
 	mp3File.SetTitle(title)
 
 	mp3File.Save()
-	mp3File.Close()
 }
 
 func htmlForURL(url string) string {

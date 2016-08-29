@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -44,14 +43,15 @@ func downloadFile(filepath string, url string) (err error) {
 func setID3TagsForFile(filepath string, artist string, title string) {
 	mp3File, err := id3v2.Open(filepath)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return
 	}
-	defer mp3File.Close()
 
 	mp3File.SetArtist(artist)
 	mp3File.SetTitle(title)
 
 	mp3File.Save()
+	mp3File.Close()
 }
 
 func htmlForURL(url string) string {

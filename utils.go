@@ -6,13 +6,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"strings"
 	"unicode"
 
-	"github.com/mikkyang/id3-go"
+	"github.com/bogem/id3v2"
 )
 
 func downloadFile(filepath string, url string) (err error) {
@@ -41,11 +42,16 @@ func downloadFile(filepath string, url string) (err error) {
 }
 
 func setID3TagsForFile(filepath string, artist string, title string) {
-	mp3File, _ := id3.Open(filepath)
+	mp3File, err := id3v2.Open(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer mp3File.Close()
 
 	mp3File.SetArtist(artist)
 	mp3File.SetTitle(title)
+
+	mp3File.Save()
 }
 
 func htmlForURL(url string) string {

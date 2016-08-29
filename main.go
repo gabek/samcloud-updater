@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 )
@@ -18,7 +18,7 @@ func init() {
 }
 
 func main() {
-	fmt.Println("*** The Bat Station mix updater ***")
+	log.Println("*** SAM Broadcaster Cloud Updater ***")
 
 	os.Remove(uploadListFile)
 

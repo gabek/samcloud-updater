@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"path"
 
@@ -16,30 +15,21 @@ func processPodcasts() {
 
 		episodeName, audioURL := itemForRssFeedURL(podcast.URL)
 
-		filename := ""
 		filetype := path.Ext(audioURL)
-
-		if filetype == ".m4a" {
-			filename = "transcode/" + GenerateSlug(podcast.Title) + ".m4a"
-		} else {
-			filename = "audio/" + GenerateSlug(podcast.Title) + ".mp3"
-		}
+		urlFilename := path.Base(audioURL)
+		filename := "downloads/" + GenerateSlug(urlFilename) + filetype
 
 		if !FileExists(filename) {
 			log.Println("Downloading " + episodeName)
 
 			downloadFile(filename, audioURL)
 
-			if filetype == ".m4a" {
-				newFilename := "audio/" + GenerateSlug(podcast.Title) + ".mp3"
-				TranscodeToMP3(filename, newFilename)
-				filename = newFilename
-			}
+			newFilename := "uploads/" + GenerateSlug(podcast.Title) + ".mp3"
+			TranscodeToMP3(filename, newFilename)
+			filename = newFilename
 
 			setID3TagsForFile(filename, podcast.Title, episodeName)
 			AddFileToUploadList(filename)
-		} else {
-			fmt.Println("no new episode.")
 		}
 	}
 }

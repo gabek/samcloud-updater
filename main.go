@@ -35,6 +35,6 @@ func main() {
 func setup() {
 	// If they don't already exist, create the directories we'll username
 	// for storing the downloaded audio files.
-	_ = os.Mkdir("./audio", os.ModePerm)
-	_ = os.Mkdir("./transcode", os.ModePerm)
+	_ = os.Mkdir("./uploads", os.ModePerm)
+	_ = os.Mkdir("./downloads", os.ModePerm)
 }

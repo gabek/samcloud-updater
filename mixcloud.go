@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"path"
 	"strings"
@@ -18,17 +17,15 @@ func processMixcloud() {
 
 		episodeTitle, url := detailsForMixcloudUser(user.Username)
 		baseFile := path.Base(url)
-		filename := "transcode/" + baseFile
+		filename := "downloads/" + baseFile
 
 		if !FileExists(filename) {
 			log.Println("Downloading " + episodeTitle)
 			downloadFile(filename, url)
-			newFilename := "audio/" + GenerateSlug(user.Title) + ".mp3"
+			newFilename := "uploads/" + GenerateSlug(user.Title) + ".mp3"
 			TranscodeToMP3(filename, newFilename)
 			setID3TagsForFile(newFilename, user.Title, episodeTitle)
 			AddFileToUploadList(newFilename)
-		} else {
-			fmt.Println("no new mix")
 		}
 	}
 }
@@ -42,8 +39,8 @@ func detailsForMixcloudUser(user string) (string, string) {
 	episode := scrape.FindAllNested(root, scrape.ByClass("card-elements-container"))[0]
 	episodeInfo := scrape.FindAllNested(episode, scrape.ByClass("play-button"))[0]
 	previewURL := (scrape.Attr(episodeInfo, "m-preview"))
-	episodeTitlte := (scrape.Attr(episodeInfo, "m-title"))
-	return episodeTitlte, fullAudioFromPreviewURL(previewURL)
+	episodeTitle := (scrape.Attr(episodeInfo, "m-title"))
+	return episodeTitle, fullAudioFromPreviewURL(previewURL)
 }
 
 func fullAudioFromPreviewURL(previewURL string) string {

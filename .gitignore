@@ -1,5 +1,8 @@
 audio/
 transcode/
+downloads/
+uploads/
+
 conf/config.yaml
 dist/
 samcloud-updater

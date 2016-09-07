@@ -84,9 +84,9 @@ func FileExists(name string) bool {
 }
 
 func TranscodeToMP3(originalFile string, destinationFile string) {
-	args := []string{"-y", "-i", originalFile, "-q:a", "2", destinationFile}
+	args := []string{"-V", "5", originalFile, destinationFile}
 
-	cmd := exec.Command("ffmpeg", args...)
+	cmd := exec.Command("lame", args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out

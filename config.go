@@ -25,9 +25,10 @@ type Station struct {
 }
 
 type Config struct {
-	Podcasts []Podcast      `yaml:"podcasts"`
-	Mixcloud []MixcloudUser `yaml:"mixcloud"`
-	Station  Station        `yaml:"station"`
+	Podcasts      []Podcast      `yaml:"podcasts"`
+	MixcloudUsers []MixcloudUser `yaml:"mixcloudusers"`
+	MixcloudTags  []string       `yaml:"mixcloudtags"`
+	Station       Station        `yaml:"station"`
 }
 
 func getConfig() Config {

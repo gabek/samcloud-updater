@@ -9,29 +9,51 @@ import (
 	"golang.org/x/net/html"
 )
 
-func processMixcloud() {
-	mixcloudUsers := getConfig().Mixcloud
+func processMixcloudUsers() {
+	mixcloudUsers := getConfig().MixcloudUsers
 
 	for _, user := range mixcloudUsers {
 		log.Print(user.Title + "...")
-
-		episodeTitle, url := detailsForMixcloudUser(user.Username)
-		baseFile := path.Base(url)
-		filename := "downloads/" + baseFile
-
-		if !FileExists(filename) {
-			log.Println("Downloading " + episodeTitle)
-			downloadFile(filename, url)
-			newFilename := "uploads/" + GenerateSlug(user.Title) + ".mp3"
-			TranscodeToMP3(filename, newFilename)
-			setID3TagsForFile(newFilename, user.Title, episodeTitle)
-			AddFileToUploadList(newFilename)
-		}
+		mixcloudURL := "http://www.mixcloud.com/" + user.Username
+		processMixcloudURL(mixcloudURL, nil)
 	}
 }
 
-func detailsForMixcloudUser(user string) (string, string) {
-	url := "http://www.mixcloud.com/" + user
+func processMixcloudTags() {
+	mixcloudTags := getConfig().MixcloudTags
+
+	for _, tag := range mixcloudTags {
+		log.Print("Mixcloud tag: " + tag + "...")
+		mixcloudURL := "https://www.mixcloud.com/discover/" + tag + "/?order=popular"
+		processMixcloudURL(mixcloudURL, &tag)
+	}
+}
+
+func processMixcloudURL(mixcloudURL string, finalFilename *string) {
+	episodeTitle, url, username := detailsForMixcloudURL(mixcloudURL)
+	extension := path.Ext(url)
+	filename := "downloads/" + GenerateSlug(username) + "-" + GenerateSlug(episodeTitle) + extension
+
+	if !FileExists(filename) {
+		log.Println("Downloading " + episodeTitle)
+		downloadFile(filename, url)
+
+		// If the caller passed in a specific filename that we should
+		// save this data to use that.  Otherwise save using the username.
+		var newFilename = ""
+		if finalFilename == nil {
+			newFilename = "uploads/" + GenerateSlug(username) + ".mp3"
+		} else {
+			newFilename = "uploads/" + *finalFilename + ".mp3"
+		}
+
+		TranscodeToMP3(filename, newFilename)
+		setID3TagsForFile(newFilename, username, episodeTitle)
+		AddFileToUploadList(newFilename)
+	}
+}
+
+func detailsForMixcloudURL(url string) (string, string, string) {
 	htmlString := htmlForURL(url)
 
 	root, _ := html.Parse(strings.NewReader(htmlString))
@@ -40,7 +62,8 @@ func detailsForMixcloudUser(user string) (string, string) {
 	episodeInfo := scrape.FindAllNested(episode, scrape.ByClass("play-button"))[0]
 	previewURL := (scrape.Attr(episodeInfo, "m-preview"))
 	episodeTitle := (scrape.Attr(episodeInfo, "m-title"))
-	return episodeTitle, fullAudioFromPreviewURL(previewURL)
+	username := (scrape.Attr(episodeInfo, "m-owner-name"))
+	return episodeTitle, fullAudioFromPreviewURL(previewURL), username
 }
 
 func fullAudioFromPreviewURL(previewURL string) string {
@@ -49,6 +72,6 @@ func fullAudioFromPreviewURL(previewURL string) string {
 	cdnServer := strings.Replace(server, "audiocdn", "stream", -1)
 	mixIdentifier := previewURL[length+9 : len(previewURL)]
 	audioFilePath := strings.Replace(mixIdentifier, ".mp3", ".m4a", -1)
-	fullUrl := cdnServer + "/c/m4a/64/" + audioFilePath
-	return fullUrl
+	fullURL := cdnServer + "/c/m4a/64/" + audioFilePath
+	return fullURL
 }

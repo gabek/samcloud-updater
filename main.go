@@ -23,7 +23,8 @@ func main() {
 	os.Remove(uploadListFile)
 
 	processPodcasts()
-	processMixcloud()
+	processMixcloudUsers()
+	processMixcloudTags()
 
 	if FileExists(uploadListFile) {
 		upload()

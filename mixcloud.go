@@ -40,15 +40,14 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 
 		// If the caller passed in a specific filename that we should
 		// save this data to use that.  Otherwise save using the username.
-		var newFilename = ""
+		var newFilename = "uploads/"
 		if finalFilename == nil {
-			newFilename = "uploads/" + GenerateSlug(username) + ".mp3"
+			newFilename += GenerateSlug(username) + ".mp3"
 		} else {
-			newFilename = "uploads/" + *finalFilename + ".mp3"
+			newFilename += *finalFilename + ".mp3"
 		}
 
-		TranscodeToMP3(filename, newFilename)
-		setID3TagsForFile(newFilename, username, episodeTitle)
+		TranscodeToMP3(filename, newFilename, username, episodeTitle)
 		AddFileToUploadList(newFilename)
 	}
 }

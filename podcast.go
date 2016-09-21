@@ -25,10 +25,9 @@ func processPodcasts() {
 			downloadFile(filename, audioURL)
 
 			newFilename := "uploads/" + GenerateSlug(podcast.Title) + ".mp3"
-			TranscodeToMP3(filename, newFilename)
+			TranscodeToMP3(filename, newFilename, podcast.Title, episodeName)
 			filename = newFilename
 
-			setID3TagsForFile(filename, podcast.Title, episodeName)
 			AddFileToUploadList(filename)
 		}
 	}

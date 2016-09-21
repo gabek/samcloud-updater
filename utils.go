@@ -11,8 +11,6 @@ import (
 	"os/exec"
 	"strings"
 	"unicode"
-
-	"github.com/bogem/id3v2"
 )
 
 func downloadFile(filepath string, url string) (err error) {
@@ -40,27 +38,6 @@ func downloadFile(filepath string, url string) (err error) {
 	return nil
 }
 
-func setID3TagsForFile(filepath string, artist string, title string) {
-	defer func() {
-		if e := recover(); e != nil {
-			fmt.Println("id3 tagging error: ", e)
-		}
-	}()
-
-	mp3File, err := id3v2.Open(filepath)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	defer mp3File.Close()
-
-	mp3File.SetArtist(artist)
-	mp3File.SetTitle(title)
-
-	mp3File.Save()
-}
-
 func htmlForURL(url string) string {
 	client := &http.Client{}
 
@@ -83,8 +60,8 @@ func FileExists(name string) bool {
 	return true
 }
 
-func TranscodeToMP3(originalFile string, destinationFile string) {
-	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", destinationFile}
+func TranscodeToMP3(originalFile string, destinationFile string, artist string, title string) {
+	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, destinationFile}
 
 	cmd := exec.Command("ffmpeg", args...)
 	var out bytes.Buffer

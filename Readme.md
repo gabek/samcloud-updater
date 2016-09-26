@@ -18,7 +18,7 @@
     The most recent _"popular"_ mix that is listed under the tag specified will be downloaded and overwrite the previous mix for this tag on your station.
 
 #### Dependancies needed to run
-* [lame](http://lame.sourceforge.net/) is required to be installed as it's used for transcoding different audio types to the target mp3s, suitable for uploading to SAM Broadcaster Cloud.  Install the correct version for your platform.  It uses `-V 5` as its target quality, averaging 132kbps.
+* [ffmpeg](https://ffmpeg.org/download.html) is required to be installed as it's used for transcoding different audio types to the target mp3s, suitable for uploading to SAM Broadcaster Cloud.  Install the correct version for your platform.  It uses `-V 5` as its target quality, averaging 132kbps.
 * The SAM Library Import Utility must be in the "SAM" subdirectory from where you are running this tool.  Since SAM Broadcaster Cloud doesn't have a standalone API We utilize SAM's _ImportUtil_ and _PlaylistUtil_ utilities for actually interacting with your station. A working Java environment is required for these tools and details can be found at SAM's [Library Import Utility](http://spacial.com/library-import-utility/) page.
 
 ### Downloads

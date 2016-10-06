@@ -61,7 +61,7 @@ func FileExists(name string) bool {
 }
 
 func TranscodeToMP3(originalFile string, destinationFile string, artist string, title string) {
-	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, destinationFile}
+	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 
 	cmd := exec.Command("ffmpeg", args...)
 	var out bytes.Buffer

@@ -30,39 +30,48 @@ func processMixcloudTags() {
 }
 
 func processMixcloudURL(mixcloudURL string, finalFilename *string) {
-	episodeTitle, url, username := detailsForMixcloudURL(mixcloudURL)
-	extension := path.Ext(url)
-	filename := "downloads/" + GenerateSlug(username) + "-" + GenerateSlug(episodeTitle) + extension
+	mixcloudDetails := detailsForMixcloudURL(mixcloudURL)
+	if mixcloudDetails == nil {
+		return
+	}
+
+	extension := path.Ext(mixcloudDetails.AudioURL)
+	filename := "downloads/" + GenerateSlug(mixcloudDetails.Username) + "-" + GenerateSlug(mixcloudDetails.EpisodeTitle) + extension
 
 	if !FileExists(filename) {
-		log.Println("Downloading " + episodeTitle)
-		downloadFile(filename, url)
+		log.Println("Downloading " + mixcloudDetails.EpisodeTitle)
+		downloadFile(filename, mixcloudDetails.AudioURL)
 
 		// If the caller passed in a specific filename that we should
 		// save this data to use that.  Otherwise save using the username.
 		var newFilename = "uploads/"
 		if finalFilename == nil {
-			newFilename += GenerateSlug(username) + ".mp3"
+			newFilename += GenerateSlug(mixcloudDetails.Username) + ".mp3"
 		} else {
 			newFilename += *finalFilename + ".mp3"
 		}
 
-		TranscodeToMP3(filename, newFilename, username, episodeTitle)
+		TranscodeToMP3(filename, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
 		AddFileToUploadList(newFilename)
 	}
 }
 
-func detailsForMixcloudURL(url string) (string, string, string) {
+func detailsForMixcloudURL(url string) *MixcloudDetails {
 	htmlString := htmlForURL(url)
 
 	root, _ := html.Parse(strings.NewReader(htmlString))
-
 	episode := scrape.FindAllNested(root, scrape.ByClass("card-elements-container"))[0]
 	episodeInfo := scrape.FindAllNested(episode, scrape.ByClass("play-button"))[0]
 	previewURL := (scrape.Attr(episodeInfo, "m-preview"))
+
+	// If we don't have any audio to handle then this mix is of no use to us
+	if previewURL == "" {
+		return nil
+	}
+
 	episodeTitle := (scrape.Attr(episodeInfo, "m-title"))
 	username := (scrape.Attr(episodeInfo, "m-owner-name"))
-	return episodeTitle, fullAudioFromPreviewURL(previewURL), username
+	return &MixcloudDetails{episodeTitle, fullAudioFromPreviewURL(previewURL), username}
 }
 
 func fullAudioFromPreviewURL(previewURL string) string {
@@ -73,4 +82,10 @@ func fullAudioFromPreviewURL(previewURL string) string {
 	audioFilePath := strings.Replace(mixIdentifier, ".mp3", ".m4a", -1)
 	fullURL := cdnServer + "/c/m4a/64/" + audioFilePath
 	return fullURL
+}
+
+type MixcloudDetails struct {
+	EpisodeTitle string
+	AudioURL     string
+	Username     string
 }

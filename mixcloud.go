@@ -4,29 +4,41 @@ import (
 	"log"
 	"path"
 	"strings"
+	"sync"
 
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 )
 
-func processMixcloudUsers() {
+func processMixcloud() {
 	mixcloudUsers := getConfig().MixcloudUsers
-
-	for _, user := range mixcloudUsers {
-		log.Print(user.Title + "...")
-		mixcloudURL := "http://www.mixcloud.com/" + user.Username
-		processMixcloudURL(mixcloudURL, nil)
-	}
-}
-
-func processMixcloudTags() {
 	mixcloudTags := getConfig().MixcloudTags
 
-	for _, tag := range mixcloudTags {
-		log.Print("Mixcloud tag: " + tag + "...")
-		mixcloudURL := "https://www.mixcloud.com/discover/" + tag + "/?order=popular"
-		processMixcloudURL(mixcloudURL, &tag)
+	var wg sync.WaitGroup
+	mixCount := len(mixcloudUsers) + len(mixcloudTags)
+	wg.Add(mixCount)
+
+	// Users
+	for _, user := range mixcloudUsers {
+		mixcloudURL := "http://www.mixcloud.com/" + user.Username
+
+		go func(mixcloudURL string) {
+			defer wg.Done()
+			processMixcloudURL(mixcloudURL, nil)
+		}(mixcloudURL)
 	}
+
+	// Tags
+	for _, tag := range mixcloudTags {
+		mixcloudURL := "https://www.mixcloud.com/discover/" + tag + "/?order=popular"
+
+		go func(mixcloudURL string) {
+			defer wg.Done()
+			processMixcloudURL(mixcloudURL, &tag)
+		}(mixcloudURL)
+	}
+
+	wg.Wait()
 }
 
 func processMixcloudURL(mixcloudURL string, finalFilename *string) {
@@ -39,7 +51,7 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 	filename := "downloads/" + GenerateSlug(mixcloudDetails.Username) + "-" + GenerateSlug(mixcloudDetails.EpisodeTitle) + extension
 
 	if !FileExists(filename) {
-		log.Println("Downloading " + mixcloudDetails.EpisodeTitle)
+		log.Println("Downloading " + mixcloudDetails.Username + ": " + mixcloudDetails.EpisodeTitle)
 		downloadFile(filename, mixcloudDetails.AudioURL)
 
 		// If the caller passed in a specific filename that we should
@@ -53,6 +65,8 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 
 		TranscodeToMP3(filename, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
 		AddFileToUploadList(newFilename)
+	} else {
+		log.Println("Nothing new for " + mixcloudDetails.Username)
 	}
 }
 

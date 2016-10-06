@@ -1,6 +1,8 @@
 podcasts:
-    - title: The Requiem Podcast
-      url: http://therequiem.libsyn.com/rss
+    - title: Dark Horizons Radio
+      url: http://www.darkhorizonsradio.com/podcasts/shows/Dark_Horizons.xml
+    - title: Communion After Dark
+      url: http://communionafterdark.com/rss.xml
       
 mixcloudusers:
     - title: DJ Dark Machine

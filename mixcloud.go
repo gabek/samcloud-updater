@@ -72,9 +72,10 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 
 func detailsForMixcloudURL(url string) *MixcloudDetails {
 	htmlString := htmlForURL(url)
-
+	
 	root, _ := html.Parse(strings.NewReader(htmlString))
-	episode := scrape.FindAllNested(root, scrape.ByClass("card-elements-container"))[0]
+
+	episode := scrape.FindAllNested(root, scrape.ByClass("card"))[0]
 	episodeInfo := scrape.FindAllNested(episode, scrape.ByClass("play-button"))[0]
 	previewURL := (scrape.Attr(episodeInfo, "m-preview"))
 

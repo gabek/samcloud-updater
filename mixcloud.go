@@ -5,7 +5,7 @@ import (
 	"path"
 	"strings"
 	"sync"
-
+	
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
 )
@@ -71,8 +71,14 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 }
 
 func detailsForMixcloudURL(url string) *MixcloudDetails {
+    defer func() {
+        if err := recover(); err != nil {
+			log.Println("Unable to process " + url + ". There may be something wrong with Mixcloud.com or your host may have been banned from accessing it.")
+        }
+    }()
+
 	htmlString := htmlForURL(url)
-	
+
 	root, _ := html.Parse(strings.NewReader(htmlString))
 
 	episode := scrape.FindAllNested(root, scrape.ByClass("card"))[0]

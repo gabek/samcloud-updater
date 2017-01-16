@@ -12,10 +12,13 @@
     The most recent episode will download and overwrite the previous episode on your station.
 
 * ##### Mixcloud Users
-    The most recent mix by each user listed will be downloaded and overwite the previous mix by this user on your station.
+    The most recent mix by each user listed will be downloaded and overwrite the previous mix by this user on your station.
 
 * ##### Mixcloud Tags
     The most recent _"popular"_ mix that is listed under the tag specified will be downloaded and overwrite the previous mix for this tag on your station.
+
+* ##### Soundcloud Users
+    The most recent track by each user listed will be downloaded and overwrite the previous track by this user on your station.
 
 #### Dependancies needed to run
 * [ffmpeg](https://ffmpeg.org/download.html) is required to be installed as it's used for transcoding different audio types to the target mp3s, suitable for uploading to SAM Broadcaster Cloud.  Install the correct version for your platform.  It uses 128k as it's bitrate.
@@ -51,6 +54,10 @@ mixcloudusers:
 
 mixcloudtags:
     - futurepop
+
+soundcloudusers:
+      - title: Funky Track Man
+        username: funkytrackman
 
 station:
   username: "your@email.address"

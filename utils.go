@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"strings"
 	"unicode"
+	"encoding/json"
 )
 
 func downloadFile(filepath string, url string) (err error) {
@@ -49,6 +50,18 @@ func htmlForURL(url string) string {
 
 	defer resp.Body.Close()
 	return string(bytes)
+}
+
+func getJson(url string, target interface{}) error {
+	client := &http.Client{}
+
+    r, err := client.Get(url)
+    if err != nil {
+        return err
+    }
+    defer r.Body.Close()
+
+    return json.NewDecoder(r.Body).Decode(target)
 }
 
 func FileExists(name string) bool {

@@ -24,10 +24,16 @@ type Station struct {
 	Playlist string `yaml:"playlist"`
 }
 
+type SoundcloudUser struct {
+	Username string `yaml:"username"`
+	Title    string `yaml:"title"`
+}
+
 type Config struct {
 	Podcasts      []Podcast      `yaml:"podcasts"`
 	MixcloudUsers []MixcloudUser `yaml:"mixcloudusers"`
 	MixcloudTags  []string       `yaml:"mixcloudtags"`
+	SoundcloudUsers []SoundcloudUser `yaml:"soundcloudusers"`
 	Station       Station        `yaml:"station"`
 }
 

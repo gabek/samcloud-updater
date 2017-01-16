@@ -24,6 +24,7 @@ func main() {
 
 	processPodcasts()
 	processMixcloud()
+	processSoundcloud()
 
 	if FileExists(uploadListFile) {
 		upload()

@@ -25,7 +25,7 @@ type Station struct {
 }
 
 type SoundcloudUser struct {
-	Username string `yaml:"username"`
+	UserId string `yaml:"userid"`
 	Title    string `yaml:"title"`
 }
 

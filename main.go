@@ -22,8 +22,11 @@ func main() {
 
 	os.Remove(uploadListFile)
 
+	log.Println("Podcasts:")
 	processPodcasts()
+	log.Println("Mixcloud:")
 	processMixcloud()
+	log.Println("Soundcloud:")
 	processSoundcloud()
 
 	if FileExists(uploadListFile) {

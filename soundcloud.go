@@ -28,14 +28,16 @@ func processSoundcloud() {
         getJson(tracklistUrl, &tracks)
         track := tracks[0]
         audio := track.Stream + "?client_id=" + clientId
-    	filename := "downloads/" + GenerateSlug(soundcloudUser.UserId) + "-" + GenerateSlug(track.Title) + ".mp3"
+    	filename := "downloads/" + GenerateSlug(soundcloudUser.Username) + "-" + GenerateSlug(track.Title) + ".mp3"
 
     	if !FileExists(filename) {
-		    log.Println("Downloading " + soundcloudUser.Title + ": " + track.Title)
+		    log.Println("Downloading " + soundcloudUser.Username + ": " + track.Title)
 		    downloadFile(filename, audio)
-            newFilename := "uploads/" + GenerateSlug(soundcloudUser.UserId) + ".mp3"
-    		TranscodeToMP3(filename, newFilename, soundcloudUser.UserId, track.Title)
+            newFilename := "uploads/" + GenerateSlug(soundcloudUser.Username) + ".mp3"
+    		TranscodeToMP3(filename, newFilename, soundcloudUser.Username, track.Title)
             AddFileToUploadList(newFilename)
+	    } else {
+		    log.Println("Nothing new for " + soundcloudUser.Username)
         }
-    }
+	}
 }

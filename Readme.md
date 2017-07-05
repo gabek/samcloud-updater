@@ -20,6 +20,8 @@
 * ##### Soundcloud Users
     The most recent track by each user listed will be downloaded and overwrite the previous track by this user on your station.
 
+    You'll need the user id number for each Soundcloud user in your config file. You can search for it [here](https://helgesverre.com/soundcloud/).
+
 #### Dependancies needed to run
 * [ffmpeg](https://ffmpeg.org/download.html) is required to be installed as it's used for transcoding different audio types to the target mp3s, suitable for uploading to SAM Broadcaster Cloud.  Install the correct version for your platform.  It uses 128k as it's bitrate.
 * The SAM Library Import Utility must be in the "SAM" subdirectory from where you are running this tool.  Since SAM Broadcaster Cloud doesn't have a standalone API We utilize SAM's _ImportUtil_ and _PlaylistUtil_ utilities for actually interacting with your station. A working Java environment is required for these tools and details can be found at SAM's [Library Import Utility](http://spacial.com/library-import-utility/) page.
@@ -56,8 +58,8 @@ mixcloudtags:
     - futurepop
 
 soundcloudusers:
-      - title: Funky Track Man
-        username: funkytrackman
+      - username: Funky Track Man
+        userId: 12345
 
 station:
   username: "your@email.address"

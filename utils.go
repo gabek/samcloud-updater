@@ -24,13 +24,17 @@ func downloadFile(filepath string, url string) (err error) {
 	defer out.Close()
 
 	// Get the data
-	resp, err := http.Get(url)
-	if err != nil {
-		return err
-	}
+	client := &http.Client{}
+
+	req, _ := http.NewRequest("GET", url, nil)
+	userAgent := getConfig().UserAgent	
+	req.Header.Set("User-Agent", userAgent)
+
+	resp, _ := client.Do(req)
+
 	defer resp.Body.Close()
 
-	// Writer the body to file
+	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
@@ -43,7 +47,8 @@ func htmlForURL(url string) string {
 	client := &http.Client{}
 
 	req, _ := http.NewRequest("GET", url, nil)
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0")
+	userAgent := getConfig().UserAgent	
+	req.Header.Set("User-Agent", userAgent)
 
 	resp, _ := client.Do(req)
 	bytes, _ := ioutil.ReadAll(resp.Body)
@@ -76,6 +81,22 @@ func FileExists(name string) bool {
 func TranscodeToMP3(originalFile string, destinationFile string, artist string, title string) {
 	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 
+	cmd := exec.Command("ffmpeg", args...)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+		return
+	}
+}
+
+func TranscodeHLSToMp3(url string, destinationFile string, artist string, title string) {
+	userAgentHeader := "User-Agent: " + getConfig().UserAgent	
+
+	args := []string{"-headers", userAgentHeader, "-i", url, "-c", "copy", "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 	cmd := exec.Command("ffmpeg", args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer

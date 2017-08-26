@@ -35,10 +35,10 @@ type Config struct {
 	MixcloudTags  []string       `yaml:"mixcloudtags"`
 	SoundcloudUsers []SoundcloudUser `yaml:"soundcloudusers"`
 	Station       Station        `yaml:"station"`
+	UserAgent	  string		 `yaml:"userAgent"`
 }
 
 func getConfig() Config {
-
 	if !FileExists("conf/config.yaml") {
 		log.Fatal("ERROR: valid conf/config.yaml is required")
 	}

@@ -63,7 +63,7 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 			newFilename += *finalFilename + ".mp3"
 		}
 
-		TranscodeToMP3(filename, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
+		TranscodeHLSToMp3(mixcloudDetails.AudioURL, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
 		AddFileToUploadList(newFilename)
 	} else {
 		log.Println("Nothing new for " + mixcloudDetails.Username)
@@ -96,12 +96,14 @@ func detailsForMixcloudURL(url string) *MixcloudDetails {
 }
 
 func fullAudioFromPreviewURL(previewURL string) string {
+	// https://testcdn.mixcloud.com/secure/hls/6/e/2/6/00d4-6bb0-4221-9cc2-47f1af0e4d15.m4a/index.m3u8
 	length := strings.Index(previewURL, "preview")
 	server := previewURL[0 : length-1]
-	cdnServer := strings.Replace(server, "audiocdn", "stream", -1)
+	cdnServer := strings.Replace(server, "audiocdn", "testcdn", -1)
 	mixIdentifier := previewURL[length+9 : len(previewURL)]
 	audioFilePath := strings.Replace(mixIdentifier, ".mp3", ".m4a", -1)
-	fullURL := cdnServer + "/c/m4a/64/" + audioFilePath
+	fullURL := cdnServer + "/secure/hls/" + audioFilePath + "/index.m3u8"
+
 	return fullURL
 }
 

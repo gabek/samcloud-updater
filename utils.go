@@ -133,6 +133,15 @@ func TranscodeHLSToMp3(url string, destinationFile string, artist string, title 
 
 	args := []string{"-headers", userAgentHeader, "-i", url, "-c", "copy", "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 	cmd := exec.Command("ffmpeg", args...)
+	
+	// If HTTP_PROXY is set in the env then set it in the custom env for running ffmpeg as "http_proxy".
+	env := os.Environ()
+	proxy := os.Getenv("HTTP_PROXY")
+	if proxy != "" {
+		env = append(env, fmt.Sprintf("http_proxy=%s", proxy))
+		cmd.Env = env
+	}
+
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out

@@ -17,7 +17,10 @@ func processPodcasts() {
 
 		go func(podcast Podcast) {
 			defer wg.Done()
-			episodeName, audioURL := itemForRssFeedURL(podcast.URL)
+			err, episodeName, audioURL := itemForRssFeedURL(podcast.URL)
+			if err != nil {
+				return
+			}
 
 			urlFilename := path.Base(audioURL)
 			originalFilename := urlFilename
@@ -42,14 +45,15 @@ func processPodcasts() {
 	wg.Wait()
 }
 
-func itemForRssFeedURL(url string) (string, string) {
+func itemForRssFeedURL(url string) (error, string, string) {
 	feed, err := rss.Fetch(url)
 	if err != nil {
-		// handle error.
+		log.Println(err)
+		return err, "", ""
 	}
 
 	episode := feed.Items[0]
 	episodeAudio := episode.Enclosures[0].Url
 	episodeTitle := episode.Title
-	return episodeTitle, episodeAudio
+	return nil, episodeTitle, episodeAudio
 }

@@ -30,10 +30,16 @@ func processPodcasts() {
 			if !HasPreviouslyDownloaded(audioURL) {
 				log.Println("Downloading " + podcast.Title + ": " + episodeName)
 
-				downloadFile(filename, audioURL)
+				err := downloadFile(filename, audioURL)
+				if err != nil {
+					return
+				}
 
 				localFilenameWithPath := "uploads/" + generatedFilename
-				TranscodeToMP3(filename, localFilenameWithPath, podcast.Title, episodeName)
+				err = TranscodeToMP3(filename, localFilenameWithPath, podcast.Title, episodeName)
+				if err != nil {
+					return
+				}
 
 				AddFileToUploadList(localFilenameWithPath)
 				MarkFileAsDownloaded(audioURL)

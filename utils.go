@@ -17,7 +17,6 @@ import (
 )
 
 func downloadFile(filepath string, url string) (err error) {
-
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
@@ -113,7 +112,7 @@ func MarkFileAsDownloaded(name string) {
 	w.Flush()
 }
 
-func TranscodeToMP3(originalFile string, destinationFile string, artist string, title string) {
+func TranscodeToMP3(originalFile string, destinationFile string, artist string, title string) error {
 	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 
 	cmd := exec.Command("ffmpeg", args...)
@@ -124,11 +123,13 @@ func TranscodeToMP3(originalFile string, destinationFile string, artist string, 
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return
+		return err
 	}
+
+	return nil
 }
 
-func TranscodeHLSToMp3(url string, destinationFile string, artist string, title string) {
+func TranscodeHLSToMp3(url string, destinationFile string, artist string, title string) error {
 	userAgentHeader := "User-Agent: " + getConfig().UserAgent	
 
 	args := []string{"-headers", userAgentHeader, "-i", url, "-c", "copy", "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
@@ -149,8 +150,10 @@ func TranscodeHLSToMp3(url string, destinationFile string, artist string, title 
 	err := cmd.Run()
 	if err != nil {
 		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
-		return
+		return err
 	}
+
+	return nil
 }
 
 func AddFileToUploadList(filename string) {

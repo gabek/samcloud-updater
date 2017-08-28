@@ -25,16 +25,30 @@ func processSoundcloud() {
 	for _, soundcloudUser := range soundcloudUsers {
         var tracks []SoundcloudTrack
         tracklistUrl := "https://api.soundcloud.com/users/" + soundcloudUser.UserId + "/tracks?client_id=" + clientId
-        getJson(tracklistUrl, &tracks)
+        err := getJson(tracklistUrl, &tracks)
+        if err != nil {
+            log.Println(err)
+            return
+        }
+
         track := tracks[0]
         audioURL := track.Stream + "?client_id=" + clientId
         filename := "downloads/" + GenerateSlug(soundcloudUser.Username) + "-" + GenerateSlug(track.Title) + ".mp3"
         
         if !HasPreviouslyDownloaded(audioURL) {
             log.Println("Downloading " + soundcloudUser.Username + ": " + track.Title)
-            downloadFile(filename, audioURL)
+            err := downloadFile(filename, audioURL)
+            if err != nil {
+                log.Println(err)
+                return
+            }
             localFilenameWithPath := "uploads/" + GenerateSlug(soundcloudUser.Username) + ".mp3"
-            TranscodeToMP3(filename, localFilenameWithPath, soundcloudUser.Username, track.Title)
+            err = TranscodeToMP3(filename, localFilenameWithPath, soundcloudUser.Username, track.Title)
+            if err != nil {
+                log.Println(err)
+                return
+            }
+            
             AddFileToUploadList(localFilenameWithPath)
             MarkFileAsDownloaded(audioURL)
         } else {

@@ -52,7 +52,10 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 
 	if !HasPreviouslyDownloaded(mixcloudDetails.OriginalTrackURL) {
 		log.Println("Downloading " + mixcloudDetails.Username + ": " + mixcloudDetails.EpisodeTitle)
-		downloadFile(filename, mixcloudDetails.AudioURL)
+		err := downloadFile(filename, mixcloudDetails.AudioURL)
+		if err != nil {
+			log.Println(err)
+		}
 
 		// If the caller passed in a specific filename that we should
 		// save this data to use that.  Otherwise save using the username.
@@ -63,7 +66,12 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 			newFilename += *finalFilename + ".mp3"
 		}
 
-		TranscodeHLSToMp3(mixcloudDetails.AudioURL, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
+		err = TranscodeHLSToMp3(mixcloudDetails.AudioURL, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
 		AddFileToUploadList(newFilename)
 		MarkFileAsDownloaded(mixcloudDetails.OriginalTrackURL)
 	} else {

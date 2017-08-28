@@ -19,20 +19,21 @@ func processPodcasts() {
 			defer wg.Done()
 			episodeName, audioURL := itemForRssFeedURL(podcast.URL)
 
-			filetype := path.Ext(audioURL)
 			urlFilename := path.Base(audioURL)
-			filename := "downloads/" + GenerateSlug(urlFilename) + filetype
+			originalFilename := urlFilename
+			generatedFilename := GenerateSlug(podcast.Title) + ".mp3"
+			filename := "downloads/" + originalFilename
 
-			if !FileExists(filename) {
+			if !HasPreviouslyDownloaded(audioURL) {
 				log.Println("Downloading " + podcast.Title + ": " + episodeName)
 
 				downloadFile(filename, audioURL)
 
-				newFilename := "uploads/" + GenerateSlug(podcast.Title) + ".mp3"
-				TranscodeToMP3(filename, newFilename, podcast.Title, episodeName)
-				filename = newFilename
+				localFilenameWithPath := "uploads/" + generatedFilename
+				TranscodeToMP3(filename, localFilenameWithPath, podcast.Title, episodeName)
 
-				AddFileToUploadList(filename)
+				AddFileToUploadList(localFilenameWithPath)
+				MarkFileAsDownloaded(audioURL)
 			} else {
 				log.Println("Nothing new for " + podcast.Title)
 			}

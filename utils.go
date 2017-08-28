@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"bufio"
 	_ "crypto/sha512"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"strings"
 	"unicode"
 	"encoding/json"
+	"time"
 )
 
 func downloadFile(filepath string, url string) (err error) {
@@ -78,6 +80,39 @@ func FileExists(name string) bool {
 	return true
 }
 
+func HasPreviouslyDownloaded(name string) bool {
+	filenameCache := getConfig().DownloadLog
+
+	if !FileExists(filenameCache) {
+		return false
+	}
+
+	f, err := ioutil.ReadFile(filenameCache)
+	if err != nil {
+        fmt.Print(err)
+    }
+
+	stringData := string(f)
+
+	return strings.Contains(stringData, name)
+}
+
+func MarkFileAsDownloaded(name string) {
+	filenameCache := getConfig().DownloadLog
+
+	file, err := os.OpenFile(filenameCache, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		fmt.Print(err)
+	}
+	defer file.Close()
+
+	timestampString := time.Now().Format("2006-01-02 15:04:05")
+	logLine := fmt.Sprintf("%s\t%s", timestampString, name)
+	w := bufio.NewWriter(file)
+	fmt.Fprintln(w, logLine)
+	w.Flush()
+}
+
 func TranscodeToMP3(originalFile string, destinationFile string, artist string, title string) {
 	args := []string{"-i", originalFile, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 
@@ -133,6 +168,5 @@ func GenerateSlug(str string) (slug string) {
 		default:
 			return -1
 		}
-		return -1
 	}, strings.ToLower(strings.TrimSpace(str)))
 }

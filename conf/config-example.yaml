@@ -1,0 +1,27 @@
+podcasts:
+    - title: The Requiem Podcast
+      url: http://therequiem.libsyn.com/rss
+    - title: Communion After Dark
+      url: http://communionafterdark.com/rss.xml
+
+mixcloudusers:
+    - title: DJ Dark Machine
+      username: djdarkmachine
+    - title: DJ Led Manville
+      username: djledmanville
+
+mixcloudtags:
+    - futurepop
+
+soundcloudusers:
+      - username: Funky Track Man
+        userId: 12345
+
+station:
+  username: "your@email.address"
+  password: yourPassword
+  id: 12345
+  playlist: Mixes
+
+userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.101 Safari/537.36"
+downloadLog: "./previouslyDownloaded.db"

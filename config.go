@@ -36,6 +36,7 @@ type Config struct {
 	SoundcloudUsers []SoundcloudUser `yaml:"soundcloudusers"`
 	Station       Station        `yaml:"station"`
 	UserAgent	  string		 `yaml:"userAgent"`
+	DownloadLog	  string		 `yaml:"downloadLog"`
 }
 
 func getConfig() Config {

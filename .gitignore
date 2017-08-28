@@ -3,9 +3,10 @@ transcode/
 downloads/
 uploads/
 
-conf/config.yaml
 dist/
 samcloud-updater
+previouslyDownloaded.db
+conf/config.yaml
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o

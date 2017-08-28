@@ -50,7 +50,7 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 	extension := path.Ext(mixcloudDetails.AudioURL)
 	filename := "downloads/" + GenerateSlug(mixcloudDetails.Username) + "-" + GenerateSlug(mixcloudDetails.EpisodeTitle) + extension
 
-	if !FileExists(filename) {
+	if !HasPreviouslyDownloaded(mixcloudDetails.OriginalTrackURL) {
 		log.Println("Downloading " + mixcloudDetails.Username + ": " + mixcloudDetails.EpisodeTitle)
 		downloadFile(filename, mixcloudDetails.AudioURL)
 
@@ -65,6 +65,7 @@ func processMixcloudURL(mixcloudURL string, finalFilename *string) {
 
 		TranscodeHLSToMp3(mixcloudDetails.AudioURL, newFilename, mixcloudDetails.Username, mixcloudDetails.EpisodeTitle)
 		AddFileToUploadList(newFilename)
+		MarkFileAsDownloaded(mixcloudDetails.OriginalTrackURL)
 	} else {
 		log.Println("Nothing new for " + mixcloudDetails.Username)
 	}
@@ -85,6 +86,11 @@ func detailsForMixcloudURL(url string) *MixcloudDetails {
 	episodeInfo := scrape.FindAllNested(episode, scrape.ByClass("play-button"))[0]
 	previewURL := (scrape.Attr(episodeInfo, "m-preview"))
 
+	// We keep a reference to the web URL of this Mixcloud episode to log
+	// that it has been downloaded.  This is due to the actual URL of the audio
+	// changing from one request to the next.
+	episodeURL := "https://www.mixcloud.com" + (scrape.Attr(episodeInfo, "m-url"))
+
 	// If we don't have any audio to handle then this mix is of no use to us
 	if previewURL == "" {
 		return nil
@@ -92,11 +98,10 @@ func detailsForMixcloudURL(url string) *MixcloudDetails {
 
 	episodeTitle := (scrape.Attr(episodeInfo, "m-title"))
 	username := (scrape.Attr(episodeInfo, "m-owner-name"))
-	return &MixcloudDetails{episodeTitle, fullAudioFromPreviewURL(previewURL), username}
+	return &MixcloudDetails{episodeTitle, fullAudioFromPreviewURL(previewURL), username, episodeURL}
 }
 
 func fullAudioFromPreviewURL(previewURL string) string {
-	// https://testcdn.mixcloud.com/secure/hls/6/e/2/6/00d4-6bb0-4221-9cc2-47f1af0e4d15.m4a/index.m3u8
 	length := strings.Index(previewURL, "preview")
 	server := previewURL[0 : length-1]
 	cdnServer := strings.Replace(server, "audiocdn", "testcdn", -1)
@@ -111,4 +116,5 @@ type MixcloudDetails struct {
 	EpisodeTitle string
 	AudioURL     string
 	Username     string
+	OriginalTrackURL	string
 }

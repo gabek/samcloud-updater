@@ -1,9 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"bufio"
+	"bytes"
 	_ "crypto/sha512"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -11,12 +12,13 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"unicode"
-	"encoding/json"
 	"time"
+	"unicode"
+
+	"strconv"
 )
 
-func downloadFile(filepath string, url string) (err error) {
+func downloadFile(filepath string, url string, maxSize int) (err error) {
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
@@ -28,7 +30,11 @@ func downloadFile(filepath string, url string) (err error) {
 	client := &http.Client{}
 
 	req, _ := http.NewRequest("GET", url, nil)
-	userAgent := getConfig().UserAgent	
+	if maxSize != 0 {
+		req.Header.Add("Range", "bytes=0-"+strconv.Itoa(maxSize))
+	}
+
+	userAgent := getConfig().UserAgent
 	req.Header.Set("User-Agent", userAgent)
 
 	resp, _ := client.Do(req)
@@ -48,7 +54,7 @@ func htmlForURL(url string) string {
 	client := &http.Client{}
 
 	req, _ := http.NewRequest("GET", url, nil)
-	userAgent := getConfig().UserAgent	
+	userAgent := getConfig().UserAgent
 	req.Header.Set("User-Agent", userAgent)
 
 	resp, _ := client.Do(req)
@@ -61,13 +67,13 @@ func htmlForURL(url string) string {
 func getJson(url string, target interface{}) error {
 	client := &http.Client{}
 
-    r, err := client.Get(url)
-    if err != nil {
-        return err
-    }
-    defer r.Body.Close()
+	r, err := client.Get(url)
+	if err != nil {
+		return err
+	}
+	defer r.Body.Close()
 
-    return json.NewDecoder(r.Body).Decode(target)
+	return json.NewDecoder(r.Body).Decode(target)
 }
 
 func FileExists(name string) bool {
@@ -88,8 +94,8 @@ func HasPreviouslyDownloaded(name string) bool {
 
 	f, err := ioutil.ReadFile(filenameCache)
 	if err != nil {
-        fmt.Print(err)
-    }
+		fmt.Print(err)
+	}
 
 	stringData := string(f)
 
@@ -129,12 +135,37 @@ func TranscodeToMP3(originalFile string, destinationFile string, artist string, 
 	return nil
 }
 
+func TranscodeFilesToMP3(originalFiles []string, destinationFile string, artist string, title string) error {
+	concatString := "concat:"
+	for i, file := range originalFiles {
+		if i > 0 {
+			concatString = concatString + "|"
+		}
+		concatString = concatString + file
+	}
+
+	args := []string{"-i", concatString, "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
+
+	cmd := exec.Command("ffmpeg", args...)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println(fmt.Sprint(err) + ": " + stderr.String())
+		return err
+	}
+
+	return nil
+}
+
 func TranscodeHLSToMp3(url string, destinationFile string, artist string, title string) error {
-	userAgentHeader := "User-Agent: " + getConfig().UserAgent	
+	userAgentHeader := "User-Agent: " + getConfig().UserAgent
 
 	args := []string{"-headers", userAgentHeader, "-i", url, "-c", "copy", "-acodec", "libmp3lame", "-ab", "128k", "-metadata", "artist=" + artist, "-metadata", "title=" + title, "-y", destinationFile}
 	cmd := exec.Command("ffmpeg", args...)
-	
+
 	// If HTTP_PROXY is set in the env then set it in the custom env for running ffmpeg as "http_proxy".
 	env := os.Environ()
 	proxy := os.Getenv("HTTP_PROXY")

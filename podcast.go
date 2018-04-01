@@ -30,7 +30,7 @@ func processPodcasts() {
 			if !HasPreviouslyDownloaded(audioURL) {
 				log.Println("Downloading " + podcast.Title + ": " + episodeName)
 
-				err := downloadFile(filename, audioURL)
+				err := downloadFile(filename, audioURL, 0)
 				if err != nil {
 					return
 				}

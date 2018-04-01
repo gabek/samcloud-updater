@@ -24,10 +24,14 @@ func main() {
 
 	log.Println("Podcasts:")
 	processPodcasts()
-	log.Println("Mixcloud:")
-	processMixcloud()
+
+	// log.Println("Mixcloud:")
+	// processMixcloud()
+
 	log.Println("Soundcloud:")
 	processSoundcloud()
+	log.Println("DNA Lounge:")
+	processDNALounge()
 
 	if FileExists(uploadListFile) {
 		upload()
